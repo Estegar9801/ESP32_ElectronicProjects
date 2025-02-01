@@ -5,7 +5,7 @@
   conectado a la placa, emitiendo tonos con las diferentes notas y crear canciones.
   Autor: David Esteban Garnica - Ingeniería Electrónica
   Fecha de creación: 15/09/2024
-  Última modificación: 17/08/2024
+  Última modificación: 20/08/2024
 */
 // ------------------------------------------------------------------------------
 // Carga de librerías
@@ -39,6 +39,13 @@ uint16_t duracionPulsoBuzzer = 100;
 
 // Almacena la frecuencia de cada tono correspondiente a cada nota del piano
 uint16_t frecuenciaNotas [17] = { 261, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523, 539, 556, 573,592 };
+
+// Graba la tecla oprimida en la grabación.
+uint16_t cancionGrabada [250];
+bool enGrabacion = false;
+String Grabando = "";
+uint16_t numeroNotasGrabadas = 0;
+uint8_t rebote = 0;
 
 void setup() {
   ledcAttach(pinBuzzer, frecuenciaPWMBuzzer, resolucionPWMBuzzer);
@@ -98,6 +105,10 @@ void loop() {
             client.print(".piano__panel{ padding: 20px; width: 100%; margin-bottom: 30px; color: #FFFFFF; display: flex; justify-content: space-between; box-shadow: 0px 4px 2px 0px rgba(0,0,0,1); }");
             client.print(".tecla-grabacion{ border-radius: 50%; width: 50px; height: 50px; background: red; box-shadow: 0px 4px 2px 0px rgba(0,0,0,1); }");
             client.print("button { border: none; }");
+            client.print(".tecla-reproducir{ border-radius: 20px 10px; padding: 0px 10px; background: #314ef7; color: #FFF; }");
+            client.print(".tecla-reproducir:hover { cursor: pointer }");
+            client.print(".tecla-borrar { border-radius: 20px 10px; padding: 0px 10px; background: #ff5050; color: #FFF; }");
+            client.print(".tecla-borrar:hover { cursor: pointer }");
             client.print(".piano__teclado{ display: flex; justify-content: center; gap: 1px; }");
             client.print(".tecla { width: 5rem; cursor: pointer; position: relative; height: 20rem; border-radius: 0px 0px 10px 10px; box-shadow: 0px 4px 2px 0px rgba(0,0,0,1); }");
             client.print(".tecla--blanca { background: #FFFFFF; }");
@@ -117,30 +128,33 @@ void loop() {
             client.print("</div>");
             client.print("<div class=\"principal-piano\">");
             client.print("<div class=\"piano__panel\">");
-            client.print("<button class=\"tecla-grabacion\"></button>");
+            client.print("<a class=\"tecla-grabacion\" href=\"/grabar\"></a>");
+            client.print("<h3>" + Grabando + "</h3>");
+            client.print("<button class=\"tecla-reproducir\" onclick=\"pulsarBoton('reproducir')\">Reproducir</button>");
+            client.print("<button class=\"tecla-borrar\" onclick=\"pulsarBoton('borrar')\">Borrar</button>");
             client.print("</div>");
             client.print("<div class=\"piano__teclado\">");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoA')\" class=\"tecla tecla--blanca\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoB')\" class=\"tecla tecla--negra\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoC')\" class=\"tecla tecla--blanca\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoD')\" class=\"tecla tecla--negra\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoE')\" class=\"tecla tecla--blanca\"></button>");            
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoF')\" class=\"tecla tecla--blanca\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoG')\" class=\"tecla tecla--negra\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoH')\" class=\"tecla tecla--blanca\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoI')\" class=\"tecla tecla--negra\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoJ')\" class=\"tecla tecla--blanca\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoK')\" class=\"tecla tecla--negra\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoL')\" class=\"tecla tecla--blanca\"></button>");            
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoM')\" class=\"tecla tecla--blanca\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoN')\" class=\"tecla tecla--negra\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoO')\" class=\"tecla tecla--blanca\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoP')\" class=\"tecla tecla--negra\"></button>");
-            client.print("<button type=\"submit\" onclick=\"tocarNota('NoQ')\" class=\"tecla tecla--blanca\"></button>");            
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoA')\" class=\"tecla tecla--blanca\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoB')\" class=\"tecla tecla--negra\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoC')\" class=\"tecla tecla--blanca\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoD')\" class=\"tecla tecla--negra\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoE')\" class=\"tecla tecla--blanca\"></button>");            
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoF')\" class=\"tecla tecla--blanca\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoG')\" class=\"tecla tecla--negra\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoH')\" class=\"tecla tecla--blanca\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoI')\" class=\"tecla tecla--negra\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoJ')\" class=\"tecla tecla--blanca\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoK')\" class=\"tecla tecla--negra\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoL')\" class=\"tecla tecla--blanca\"></button>");            
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoM')\" class=\"tecla tecla--blanca\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoN')\" class=\"tecla tecla--negra\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoO')\" class=\"tecla tecla--blanca\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoP')\" class=\"tecla tecla--negra\"></button>");
+            client.print("<button type=\"submit\" onclick=\"pulsarBoton('NoQ')\" class=\"tecla tecla--blanca\"></button>");            
             client.print("</div></div></main>");
             client.print("<script>");
-            client.print("function tocarNota(nota){ ");
-            client.print("enlace = \"/\" + nota;"); 
+            client.print("function pulsarBoton(boton){ ");
+            client.print("enlace = \"/\" + boton;"); 
             client.print("actual = location.pathname; if (enlace == actual) { enlace += \"2\"; }"); 
             client.print("window.history.pushState(null, null, enlace);");            
             client.print("}");
@@ -164,56 +178,130 @@ void loop() {
         }
         // Se identifica en el encabezado de la solicitud, si alguna de las teclas del piano fue oprimida, se identifica cuál y se activa el buzzer
         // enviando la posición de la nota en el arreglo de frecuencias.
-        if(currentLine.endsWith("/NoA")){
-          sonarBuzzer(0);
+        
+        rebote++;
+
+        if (rebote % 2 == 0){
+          if(currentLine.endsWith("/NoA")){
+            sonarBuzzer(0);
+            if (enGrabacion){
+              grabarNota(0);
+            }
+          }
+          if(currentLine.endsWith("/NoB")){          
+            sonarBuzzer(1);
+            if (enGrabacion){ 
+              grabarNota(1);
+            }
+          }
+          if(currentLine.endsWith("/NoC")){          
+            sonarBuzzer(2);
+            if (enGrabacion){
+              grabarNota(2);
+            }
+          }
+          if(currentLine.endsWith("/NoD")){          
+            sonarBuzzer(3);
+            if (enGrabacion){
+              grabarNota(3);
+            }
+          }
+          if(currentLine.endsWith("/NoE")){          
+            sonarBuzzer(4);
+            if (enGrabacion){
+              grabarNota(4);
+            }
+          }
+          if(currentLine.endsWith("/NoF")){          
+            sonarBuzzer(5);
+            if (enGrabacion){
+              grabarNota(5);
+            }
+          }
+          if(currentLine.endsWith("/NoG")){          
+            sonarBuzzer(6);
+            if (enGrabacion){
+              grabarNota(6);
+            }
+          }
+          if(currentLine.endsWith("/NoH")){          
+            sonarBuzzer(7);
+            if (enGrabacion){
+              grabarNota(7);
+            }
+          }
+          if(currentLine.endsWith("/NoI")){          
+            sonarBuzzer(8);
+            if (enGrabacion){
+              grabarNota(8);
+            }
+          }
+          if(currentLine.endsWith("/NoJ")){          
+            sonarBuzzer(9);
+            if (enGrabacion){
+              grabarNota(9);
+            }
+          }
+          if(currentLine.endsWith("/NoK")){          
+            sonarBuzzer(10);
+            if (enGrabacion){
+              grabarNota(10);
+            }
+          }
+          if(currentLine.endsWith("/NoL")){          
+            sonarBuzzer(11);
+            if (enGrabacion){
+              grabarNota(11);
+            }
+          }
+          if(currentLine.endsWith("/NoM")){          
+            sonarBuzzer(12);
+            if (enGrabacion){
+              grabarNota(12);
+            }
+          }
+          if(currentLine.endsWith("/NoN")){          
+            sonarBuzzer(13);
+            if (enGrabacion){
+              grabarNota(13);
+            }
+          }
+          if(currentLine.endsWith("/NoO")){          
+            sonarBuzzer(14);
+            if (enGrabacion){
+              grabarNota(14);
+            }
+          }
+          if(currentLine.endsWith("/NoP")){          
+            sonarBuzzer(15);
+            if (enGrabacion){
+              grabarNota(15);
+            }
+          }
+          if(currentLine.endsWith("/NoQ")){          
+            sonarBuzzer(16);
+            if (enGrabacion){
+              grabarNota(16);
+            }
+          }                  
+          // Si se oprimió el botón de reproducir, se reproduce la canción.
+          if(currentLine.endsWith("/reproducir")){
+            Serial.println("Voy a reproducir la canción.");
+            reproducirCancion();
+          }
         }
-        if(currentLine.endsWith("/NoB")){          
-          sonarBuzzer(1);
+        // Si oprime el botón de grabar cambia de estado de la variable de grabación.
+        if(currentLine.endsWith("/grabar")){     
+          enGrabacion = !enGrabacion;
+          if ( enGrabacion ) {            
+            Grabando = "Grabando";            
+          }else{            
+            Grabando = "";            
+          }
         }
-        if(currentLine.endsWith("/NoC")){          
-          sonarBuzzer(2);
-        }
-        if(currentLine.endsWith("/NoD")){          
-          sonarBuzzer(3);
-        }
-        if(currentLine.endsWith("/NoE")){          
-          sonarBuzzer(4);
-        }
-        if(currentLine.endsWith("/NoF")){          
-          sonarBuzzer(5);
-        }
-        if(currentLine.endsWith("/NoG")){          
-          sonarBuzzer(6);
-        }
-        if(currentLine.endsWith("/NoH")){          
-          sonarBuzzer(7);
-        }
-        if(currentLine.endsWith("/NoI")){          
-          sonarBuzzer(8);
-        }
-        if(currentLine.endsWith("/NoJ")){          
-          sonarBuzzer(9);
-        }
-        if(currentLine.endsWith("/NoK")){          
-          sonarBuzzer(10);
-        }
-        if(currentLine.endsWith("/NoL")){          
-          sonarBuzzer(11);
-        }
-        if(currentLine.endsWith("/NoM")){          
-          sonarBuzzer(12);
-        }
-        if(currentLine.endsWith("/NoN")){          
-          sonarBuzzer(13);
-        }
-        if(currentLine.endsWith("/NoO")){          
-          sonarBuzzer(14);
-        }
-        if(currentLine.endsWith("/NoP")){          
-          sonarBuzzer(15);
-        }
-        if(currentLine.endsWith("/NoQ")){          
-          sonarBuzzer(16);
+
+        if(currentLine.endsWith("/borrar")){
+          numeroNotasGrabadas = 0;
         }
       }
     }
@@ -221,10 +309,25 @@ void loop() {
     Serial.println("Cliente desconectado.");
   }
 }
-/*  Función: sonasBuzzer
+void reproducirCancion(){
+  uint16_t recorridoCancion = 0;
+
+  while (recorridoCancion < sizeof(cancionGrabada) && recorridoCancion < numeroNotasGrabadas){    
+    sonarBuzzer(cancionGrabada[recorridoCancion]);
+    recorridoCancion += 2;
+    delay(300);
+  }
+}
+/*  Función: sonarBuzzer
     Descripción: Activa el buzzer conectado al ESP32 durante un instante de tiempo, especificando la frecuencia del tono que se desea reproducir. 
     Se activa con cada interacción con el piano virtual.
 */
 void sonarBuzzer(uint16_t i){
   tone(pinBuzzer, frecuenciaNotas[i], duracionPulsoBuzzer);
+  Serial.print(frecuenciaNotas[i]);
+}
+
+void grabarNota(uint16_t nota){
+  cancionGrabada[numeroNotasGrabadas] = nota;
+  numeroNotasGrabadas += 1;
 }

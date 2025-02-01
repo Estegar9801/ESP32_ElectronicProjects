@@ -63,6 +63,18 @@
             background: red;
             box-shadow: 0px 4px 2px 0px rgba(0,0,0,1);
         }
+
+        .tecla-reproducir{
+            border-radius: 20px 10px;
+            padding: 0px 10px;
+            background: #314ef7;
+            color: #FFF;
+        }
+
+        .tecla-reproducir:hover{
+            cursor: pointer;
+        }
+
         button {
             border: none;
         }
@@ -121,6 +133,7 @@
         <div class="principal-piano">
             <div class="piano__panel">
                 <button class="tecla-grabacion"></button>
+                <button class="tecla-reproducir">Reproducir</button>
             </div>
             <div class="piano__teclado">
                 <button type="submit" onclick="tocarNota('A')" class="tecla tecla--blanca"></button>
