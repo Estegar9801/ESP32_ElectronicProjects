@@ -13,8 +13,8 @@
 // --------------------------------------------------------------------------------
 // Definición de pines
 // --------------------------------------------------------------------------------
-#define PIN_TRIGGER 5  // Pin del ESP32 conectado a la terminal Trigger del sensor HC-SR04
-#define PIN_ECHO 18    // Pin del ESP32 conectado a la terminal Echo del sensor HC-SR04
+#define PIN_TRIGGER 19  // Pin del ESP32 conectado a la terminal Trigger del sensor HC-SR04
+#define PIN_ECHO 23    // Pin del ESP32 conectado a la terminal Echo del sensor HC-SR04
 // --------------------------------------------------------------------------------
 // Variables globales
 // --------------------------------------------------------------------------------

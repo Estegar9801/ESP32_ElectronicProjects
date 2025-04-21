@@ -3,7 +3,7 @@
   Descripción: Este proyecto nos introduce al mundo de la electrónica digital
   y la programación de microcontroladores. Encenderemos y apagaremos el LED de
   la tarjeta ESP32 durante unos segundos.
-  Autor: Johah Hernández - Ingeniería Electrónica
+  Autor: Johan Hernández - Ingeniería Electrónica
   Fecha de creación: 09/08/2024
   Última modificación: 09/08/2024
 */
