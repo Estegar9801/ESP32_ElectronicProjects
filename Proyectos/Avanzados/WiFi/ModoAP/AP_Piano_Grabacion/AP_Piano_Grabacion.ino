@@ -5,7 +5,7 @@
   conectado a la placa, emitiendo tonos con las diferentes notas y crear canciones.
   Autor: David Esteban Garnica - Ingeniería Electrónica
   Fecha de creación: 15/09/2024
-  Última modificación: 20/08/2024
+  Última modificación: 26/04/2025
 */
 // ------------------------------------------------------------------------------
 // Carga de librerías
@@ -58,7 +58,9 @@ void setup() {
     while(1);
   }
 
+  
   IPAddress direccionIP = WiFi.softAPIP();  // Se define la dirección IP del punto de acceso.
+  delay(1000);
   Serial.print("Mi dirección IP es: "); 
   Serial.println(direccionIP);  // Se imprime en el puerto serial la dirección IP a la cuál se debe acceder desde el navegador.
   server.begin(); 

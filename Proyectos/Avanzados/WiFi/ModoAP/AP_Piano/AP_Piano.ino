@@ -8,7 +8,7 @@
   
   Autor: David Esteban Garnica - Ingeniería Electrónica
   Fecha de creación: 15/09/2024
-  Última modificación: 17/08/2024
+  Última modificación: 26/04/2025
 */
 // ------------------------------------------------------------------------------
 // Carga de librerías
@@ -20,7 +20,7 @@
 // ------------------------------------------------------------------------------
 // Definición de pines
 // ------------------------------------------------------------------------------
-#define pinBuzzer 13
+#define PIN_BUZZER 13
 
 // ------------------------------------------------------------------------------
 // Definición de las credenciales de la red
@@ -44,7 +44,7 @@ uint16_t duracionPulsoBuzzer = 100;
 uint16_t frecuenciaNotas [17] = { 261, 277, 294, 311, 330, 349, 370, 392, 415, 440, 466, 494, 523, 539, 556, 573,592 };
 
 void setup() {
-  ledcAttach(pinBuzzer, frecuenciaPWMBuzzer, resolucionPWMBuzzer);
+  ledcAttach(PIN_BUZZER, frecuenciaPWMBuzzer, resolucionPWMBuzzer);
 
   Serial.begin(115200); // Inicio del puerto serial
   Serial.print("Configurando Punto de acceso ...");
@@ -55,6 +55,7 @@ void setup() {
   }
 
   IPAddress direccionIP = WiFi.softAPIP();  // Se define la dirección IP del punto de acceso.
+  delay(1000);
   Serial.print("Mi dirección IP es: "); 
   Serial.println(direccionIP);  // Se imprime en el puerto serial la dirección IP a la cuál se debe acceder desde el navegador.
   server.begin(); 
@@ -225,9 +226,10 @@ void loop() {
   }
 }
 /*  Función: sonasBuzzer
-    Descripción: Activa el buzzer conectado al ESP32 durante un instante de tiempo, especificando la frecuencia del tono que se desea reproducir. 
+    Descripción: Activa el buzzer conectado al ESP32 durante un instante de tiempo,
+    especificando la frecuencia del tono que se desea reproducir. 
     Se activa con cada interacción con el piano virtual.
 */
 void sonarBuzzer(uint16_t i){
-  tone(pinBuzzer, frecuenciaNotas[i], duracionPulsoBuzzer);
+  tone(PIN_BUZZER, frecuenciaNotas[i], duracionPulsoBuzzer);
 }
